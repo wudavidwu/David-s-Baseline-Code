@@ -1,0 +1,179 @@
+ <!DOCTYPE html>
+<html>
+<head>
+<title>Baseline Line Rotation Experiment</title>
+<!-- call define which plugins to use -->
+<script src="jsPsych/jspsych.js"></script>
+<script src="jsPsych/plugins/jspsych-html-keyboard-response.js"></script>
+<script src="jsPsych/plugins/jspsych-html-button-response.js"></script>
+<script src="jsPsych/plugins/jspsych-instructions.js"></script>
+<script src="jsPsych/plugins/jspsych-fullscreen.js"></script>
+<script src="jsPsych/plugins/jspsych-survey-text.js"></script>
+
+<!-- My plugin to randomize images and call the white line-->
+<script src="img1/Plugins/White_line_black_dot_control.js"></script>
+<script src="img1/plugins/random_image_storage.js"></script>
+
+<link	href="jsPsych/css/jspsych.css"	rel="stylesheet" type="text/css"> 
+<!-- within each plugin, there is a protocol to follow -->
+<style>
+body {
+  background-color: rgb(132,132,132);
+}
+.jspsych-instructions-nav { margin-bottom: 100px; }
+#consentDiv { font-size: 9pt; text-align: justify; }
+</style>
+</head>
+<body>
+<script>
+/* Require a new-ish browser: 
+------------------------------------------ */
+function supportsLiterals() {
+  try { return eval("''===``") }
+  catch(e) { return false; }
+}
+if (!supportsLiterals()) {
+	var txt = "Sorry, this experiment requires a newer browser, so yours is not able to be used. The latest Chrome, Firefox, Safari or Edge all work.";
+	alert(txt); 
+	document.body.onload = function() { document.body.innerHTML = txt; };
+}
+
+
+var trialList = [];
+
+trialList.push({
+  type: 'fullscreen',
+  fullscreen_mode: true
+});
+
+trialList.push({
+	type: "instructions",
+	pages: ['<p>Welcome!</p>', '<p>In this experiment, a gradient will appear next to a white line. Your task is to match the orientation of the white line to the orientation of the gradient.</p>', '<p> You will treat the letters "W" "A" "S" and "D" essentially as arrow keys. </p>',
+  '<p>Use the "S" key to move the line clockwise. Use the "W" key to move the line counterclockwise. You can also use the "D" key to move the line clockwise or the "A" key to move the linecounter clockwise <b>Faster</b></p>', '<p>Be fast! You only have 3 seconds to complete each trial.</p>', '<p> You will now begin some practice trials. </p>'],
+  show_clickable_nav: true
+})
+
+var afterPracticeInstructions = {
+  type: "instructions",
+  pages: ['<p>Great job you finished the practice. Press Next to Begin the REAL experiment </p>'],
+  show_clickable_nav: true
+}
+
+
+// before the trial can start you need to click Space
+var spacebarTrial = {
+  type: 'html-keyboard-response',
+  stimulus: 'Press space to continue.',
+  choices: [' '] 
+};
+/* Image trial */
+var displayLineTrial = {
+  type: 'display-line', // This references the plugin defined
+};
+
+var displayImage = {
+  type: 'display-img'
+};
+
+// practice trials
+for (var i = 0; i < 10; i++) { // 10 repetitions
+  trialList.push(spacebarTrial);
+  trialList.push(displayImage);
+  // trialList.push(displayLineTrial);
+}
+
+// After practice instructions
+trialList.push(afterPracticeInstructions);
+
+var secondInstructions = {
+  type: "instructions",
+  pages: ['<p>Great! You finished all of the practice trials. </p> <p> Now here are the real trials </'],
+  show_clickable_nav: true
+};
+
+var endInstructions = {
+  type: "instructions",
+  pages: ['<p>Thank you for participating! </p>', '<p>You have completed all the trials. </p>', '<p>Press Next to participate in a final survey and finish the experiment. </p>'],
+  show_clickable_nav: true
+};
+
+
+var repetitions = 5; // Number of repetitions
+
+for (var i = 0; i < repetitions; i++) {
+  trialList.push(spacebarTrial);
+  trialList.push(displayImage);
+
+}
+
+trialList.push(endInstructions);
+
+
+
+trialList.push({
+	type: 'survey-text',
+	preamble: "Thank you! You're just about done. If you would, please tell us about yourself:",
+	questions: [
+		{prompt: "How old are you?", name: 'age', rows: 1, columns: 5}, 
+		{prompt: "Gender:", name: 'gender', rows: 1, columns: 5},
+		{prompt: "Any comments? Was it fun? Any technical difficulties?:", name: 'comments', rows: 3, columns: 40}
+	],
+	button_label: "Submit"
+});
+
+// this is storing the data you want into the server
+function saveData() {
+  // Retrieve the rotation data
+  var lastTrialData = jsPsych.data.getLastTrialData().values()[0];
+  var initialRotationImg = lastTrialData.initialRotationImg;
+  var finalRotationLine = lastTrialData.finalRotationLine;
+  var initialRotationLine = lastTrialData.initialRotationLine;
+
+  // create variable d for data
+  var d = { 
+    "sonaCode": jsPsych.data.getURLVariable('code'),
+    "curTime": jsPsych.startTime(),
+    "userAgent": navigator.userAgent,
+    "windowWidth": window.innerWidth,
+    "windowHeight": window.innerHeight,
+    "screenWidth": screen.width,
+    "screenHeight": screen.height,   
+    "totalTime": jsPsych.totalTime(),    
+    "interactionData": jsPsych.data.getInteractionData().json(),
+    "trialStruct": jsPsych.data.get().json(),
+    "initialRotationImg": initialRotationImg,
+    "initialRotationLine": initialRotationLine,
+    "finalRotation": finalRotation
+  };
+	var data = new FormData();
+	data.append('id', jsPsych.randomization.randomID(15));
+	data.append('experimenter', 'David');
+	data.append('experimentName', 'David_Candy_Baseline');
+	data.append('curData', JSON.stringify(d));
+  var xhr = new XMLHttpRequest();
+  xhr.open('POST', 'https://bradylab.ucsd.edu/turk/save.php');
+	xhr.onload = function() {
+		//20tb29
+		window.location.href = "https://ucsd.sona-systems.com/webstudy_credit.aspx?experiment_id=1937&credit_token=25e86e8f389448bb96167fe823f044b3&survey_code=" + jsPsych.data.getURLVariable('code');
+	};
+	xhr.send(data);
+}
+
+
+// this goes at the very end. order matters
+jsPsych.init({
+  timeline: trialList,
+  // preload_images: ['img1/Whiteline1.png'],
+  use_webaudio: false,
+  experiment_width: 750,
+  default_iti: 100,
+  exclusions: {
+	min_width: 700,
+	min_height: 500
+  }
+});
+
+
+</script>
+</body>
+</html> 

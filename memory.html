@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Face memory experiment</title>
+<script src="jsPsych/jspsych.js"></script>
+<script src="jsPsych/plugins/jspsych-continuous-image-percep.js"></script>
+<script src="jsPsych/brady_plugins/jspsych-continuous-image-wm.js"></script>
+<script src="jsPsych/plugins/jspsych-html-keyboard-response.js"></script>
+<script src="jsPsych/plugins/jspsych-instructions.js"></script>
+<script src="jsPsych/plugins/jspsych-fullscreen.js"></script>
+<script src="jsPsych/plugins/jspsych-survey-text.js"></script>
+<link	href="jsPsych/css/jspsych.css"	rel="stylesheet" type="text/css">
+<style>
+body {
+  background-color: gray;
+}
+#jspsych-progressbar-container {
+  background-color: #000000;
+  color: #CCCCCC;
+}
+.jspsych-instructions-nav { margin-bottom: 100px; }
+#consentDiv { font-size: 9pt; text-align: justify; }
+</style>
+</head>
+<body>
+<script>
+/* Require a new-ish browser: 
+------------------------------------------ */
+function supportsLiterals() {
+  try { return eval("''===``") }
+  catch(e) { return false; }
+}
+if (!supportsLiterals()) {
+	var txt = "Sorry, this experiment requires a newer browser, so yours is not able to be used. The latest Chrome, Firefox, Safari or Edge all work.";
+	alert(txt); 
+	document.body.onload = function() { document.body.innerHTML = txt; };
+}
+
+
+/* Instructions 
+------------------------------------------ */
+var trialList = [];
+trialList.push({
+	type: "instructions",
+	pages: ['<p>In this experiment, you will have to remember some briefly presented faces. You will need to do 360 trials, each of which takes about 3-5 seconds. It should take less than 50 minutes total. <strong>Please do not participate if you do not have normal or corrected-to-normal color vision.</strong> It is OK if you do both this study and other similar SONA studies that require face judgments.</p><p>On each trial you will see 4 squares:</p><p align="center"><img src="instructions/empty.png" width="500" border=0></p>	<p>When you click to start the trial, these squares will fill in with either 1, 2 or 4 faces. The faces will be presented only briefly &mdash; shown for just 1 second &mdash; so be sure not to click to start the trial until you are ready. <strong>Your job is to remember which exact face is in each location as best you can:</strong></p><p align="center"><img src="instructions/faceDif_4.png" width="500" border=0></p><p>After the faces disappear, you will be almost immediately tested on your memory. One of the placeholder squares will get a darker border to tell you which face to report. You will be shown an entire "wheel" of faces to choose from. As you move your mouse around the wheel, the face at the indicated location will change, and you will need to set it (as accurately as possible) on exactly what the face that was that was shown in the indicated location (or as close as you can remember):</p> <p align="center"><img src="instructions/faceDif_4_test.png" width="500" border=0></p> <p>You will need to click on the actual black circle to lock in your answer, though the face will change as you move your mouse even if it is not on the wheel, to make finding the right area of the wheel faster.</p>', '<p>Sometimes the faces you remember will be very different, as in the previous example</p><p>Other times you will see much more similar faces. For example, you might see only 2 faces but they might be extremely similar to each other, like the same person under different lighting: <p align="center"><img src="instructions/faceSim_2.png" width="500" border=0></p><p>When you see such similar faces, the face wheel will also be made up of all extremely similar faces:<p align="center"><img src="instructions/faceSim_2_test.png" width="500" border=0></p><p>At first, these may be hard to tell apart, but with some practice you will learn that the faces on different parts of this wheel are actually distinct in important ways (e.g., nose size, lighting, head angle, etc).</p><p>So, overall, some trials you will see 1,2, or the full set of 4 squares filled in with faces, and some trials these faces will be very distinct or sometimes very similar. You will not know how many faces will appear on a trial or how similar they will be until you start that trial.', '<p>We recognize that remembering 4 very quickly flashed faces is very difficult. We ask that you do your best to accurately report the faces but recognize that you will make some errors.</p>', '<p>We are interested in your <b>VISUAL</b> memory. So it is important that you do not say names for the faces to yourself or use words to perform the task. In fact, to be sure you do not do this, we suggest you repeat the word "the" over and over in your head when the faces are presented. This will help you to remember not to use words to remember the faces.</p>', 'Before beginning, you must give informed consent. Please read the following and indicate your agreement by continuing to the next page to start the practice trials:<div id="consentDiv"><p><u>Consent to Participate in Research:</u></p><p>Timothy Brady, Ph.D., is conducting a research study to find out more about attention, memory and vision.  You have been asked to participate because you are a healthy young adult.  There will be approximately 1500 participants in this study this year. The expected duration of the study is 10 years, though your participation will last only between 3 minutes and 90 minutes, with the exact expected timing listed in the task description.</p><p>PROCEDURES.  If you agree to participate in this study by accepting this agreement and continuing in the task, the following will happen to you: 1. You will be shown displays of letters, words, or pictures, right here in your web browser. 2. You will try to perceive and remember these stimuli, and respond by pressing keys or moving and clicking the mouse in a manner that we will describe to you.</p><p>RISKS.  You will be required only to continue to interact with your web browser and make responses for a short duration. Thus, no potential risks or discomforts are anticipated except for the possibility that some tasks may be slightly boring. However, there may be risks that are currently unforeseeable.</p><p>PAYMENT/REMUNERATION. In consideration of your time, you will receive payment at the rate described through the recruitment system, in either course credit or monetary renumeration. Compensation will range from $0.60 (for a 3 min task) up to as much as $20 (for a task that takes 90 min), with rates between $8/hr and $12/hr. The exact payment rate for this task is provided in the task description.</p><p>RIGHTS.  You may call the UCSD Human Research Protection Program at 858-246-HRPP to ask about your rights as a research subject or to report research-related problems.</p><p>BENEFITS.  There will be no direct benefit to you from these procedures.  However, the investigator may learn more about basic questions pertaining to attention, memory and vision.   This knowledge may have benefits to society in fields ranging from improving education to visual design, but these benefits will be indirect. </p><p>EXPLANATION.  The researcher has explained this study to you and answered your questions.  If you have questions about the research or research-related problems, including any adverse events, you may reach Dr. Timothy Brady at timbrady@ucsd.edu or 858-822-4530.</p><p>VOLUNTARY NATURE OF PARTICIPATION.  Participation in research is entirely voluntary.  You may refuse to participate or withdraw at any time without penalty. The alternative to participation is to choose not to participate.</p><p>CONFIDENTIALITY.  Research records will be kept confidential to the extent allowed by law.  As with all research, there is also the possibility of loss of confidentiality.  Information from participants such as yourself will be identified by a subject number, which is not associated with your identity, by the researchers, to minimize the potential loss of confidentiality. </p><p>By clicking "Next", you are indicating that you are at least 18 years old, have read this consent form and agree to participate in this research study. Please print a copy of this page for your records.</p></div>','<p>Please keep your attention on the task for the entire time. To help with this, the next, final page of instructions will make the experiment full screen. You should also know we are recording if you switch windows or tabs, or if you take a long time to respond, so please only take breaks at the indicated times and not for more than 1 minute. Thank you!!</p>'],
+  show_clickable_nav: true
+})
+
+trialList.push({
+  type: 'fullscreen',
+  fullscreen_mode: true
+});
+
+var faceWheels = ["SpacesNoBG/small90.png", "SpacesNoBG/medium90.png", "SpacesNoBG/big90.png"];
+
+var trialListTemp = [];
+for (var w=0; w<faceWheels.length; w++) {
+	setSizes=jsPsych.randomization.repeat([1,2,4], 40);
+	for (var i=0; i<setSizes.length; i++) {
+		trialListTemp.push({
+		  type: 'continuous-image',
+		  wheel_spin: false,
+      bg_color: "gray",
+			display_time: 1000,
+		  num_placeholders: 4,
+		  image_sprite: faceWheels[w],
+		  radius: 130,
+		  feedback: true,
+		  set_size: setSizes[i],
+			on_load: function() {
+			  var curWidth = parseInt(window.getComputedStyle(document.getElementById('contImgMemoryBox')).width);
+				var browserWidth = parseInt(window.getComputedStyle(document.body).width)-100;
+			  var curHeight = parseInt(window.getComputedStyle(document.getElementById('contImgMemoryBox')).height);
+				var browserHeight = parseInt(window.getComputedStyle(document.body).height)-50;
+				var ratioW = browserWidth/curWidth;
+				var ratioH = browserHeight/curHeight;
+				var scaleFactor = (ratioW<ratioH) ? ratioW-0.1 : ratioH-0.1;
+				if (scaleFactor<1) { scaleFactor=1; }
+				document.getElementById('contImgMemoryBox').style.transform = "scale("+scaleFactor+")";
+			},
+		  data: {
+				wheel: w,
+				wheelName: faceWheels[w],
+				setSize: setSizes[i],
+		  }
+		});
+	}
+}
+trialListTemp = jsPsych.randomization.shuffle(trialListTemp);
+for (var i=0; i<trialListTemp.length; i++) {
+	trialList.push(trialListTemp[i]);
+}
+
+trialList.push({
+	type: 'survey-text',
+	preamble: "Thank you! You're just about done. If you would, please tell us about yourself:",
+	questions: [
+		{prompt: "How old are you?", name: 'age', rows: 1, columns: 5}, 
+		{prompt: "Gender:", name: 'gender', rows: 1, columns: 5},
+		{prompt: "Any comments? Was it fun? Any technical difficulties?:", name: 'comments', rows: 3, columns: 40}
+	],
+	button_label: "Submit", 
+	on_finish: saveData
+});
+
+
+function saveData() {
+	// create variable d for data
+	 d = { 
+		"sonaCode": jsPsych.data.getURLVariable('code'),
+		"curTime": jsPsych.startTime(),
+		"userAgent": navigator.userAgent,
+		"windowWidth": window.innerWidth,
+		"windowHeight": window.innerHeight,
+		"screenWidth": screen.width,
+		"screenHeight": screen.height,   
+		"totalTime": jsPsych.totalTime(),    
+		"interactionData": jsPsych.data.getInteractionData().json(),
+		"trialStruct": jsPsych.data.get().json()
+	};
+	var data = new FormData();
+	data.append('id', jsPsych.randomization.randomID(15));
+	data.append('experimenter', 'Tim');
+	data.append('experimentName', 'FaceSpaces_Mem');
+	data.append('curData', JSON.stringify(d));
+  var xhr = new XMLHttpRequest();
+  xhr.open('POST', 'https://bradylab.ucsd.edu/turk/save.php');
+	xhr.onload = function() {
+		//20tb29
+		window.location.href = "https://ucsd.sona-systems.com/webstudy_credit.aspx?experiment_id=1937&credit_token=25e86e8f389448bb96167fe823f044b3&survey_code=" + jsPsych.data.getURLVariable('code');
+	};
+	xhr.send(data);
+}
+
+jsPsych.init({
+	timeline: trialList,
+	show_progress_bar: true,
+	show_preload_progress_bar: true,
+	auto_update_progress_bar: true,	
+	preload_images: ['SpacesNoBG/small90.png', 'SpacesNoBG/medium90.png','SpacesNoBG/big90.png'],
+	message_progress_bar: "Progress on entire study:",
+	use_webaudio: false,
+	experiment_width: 750,
+	default_iti: 100,
+	exclusions: {
+		min_width: 700,
+		min_height: 500
+	}
+});
+			
+			
+			
+/* HELPERS:
+***************************************** */			
+			
+/* Get random int: */
+function getRandomIntInclusive(min, max) {
+	min = Math.ceil(min);
+	max = Math.floor(max);
+	return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+/* Make sure all numbers in an array are between 0 and 360: */
+function wrap(v) {
+	if (Array.isArray(v)) {
+		for (var i=0; i<v.length; i++) {
+			if (v[i]>=360) { v[i]-=360; }
+			if (v[i]<0) { v[i]+=360; }
+		}    
+	} else {
+		if (v>=360) { v-=360; }
+		if (v<0) { v+=360; }
+	}
+	return v;
+} 
+</script>
+</body>
+</html>
